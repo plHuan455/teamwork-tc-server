@@ -1,0 +1,59 @@
+@baseURL = http://localhost:8080/api/todos
+@demoGroupId = 6230626f4257f7717c825a53
+@myGroupId = 62306b152e4292f5fb7ee938
+@huan = 622f1ea18b9ec92b8ef4c258
+
+################################
+POST {{baseURL}}/always-change
+Content-Type: application/json
+
+{
+    "userId": "{{huan}"
+}
+
+### get 
+POST {{baseURL}}/get
+Content-Type: application/json
+
+{
+    "userId": "{{huan}}",
+    "groupId":"{{myGroupId}}",
+    "month":"2",
+    "year":"2022"
+}
+
+
+### get passed
+POST {{baseURL}}/getPassed
+Content-Type: application/json
+
+{
+    "userId": "{{huan}}",
+    "groupId":"{{demoGroupId}}"
+}
+
+
+### add
+POST {{baseURL}}/add
+Content-Type: application/json
+
+{
+    "userId": "622f545381539a19e2ba0d5f",
+    "groupId":"{{myGroupId}}",
+    "data":{
+        "name":"even 22",
+        "from":"2022-03-16T02:57:47.801Z",
+        "to":"2022-03-19T17:00:00.000Z"
+    }
+}
+
+
+### get todo list
+POST {{baseURL}}/get-todos
+Content-Type: application/json
+
+{
+    "userId":"{{huan}}",
+    "groupId":"6230626f4257f7717c825a53",
+    "noteId":"6231eb98ed0e70b3ac3267b0"
+}

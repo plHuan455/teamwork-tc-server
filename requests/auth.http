@@ -1,0 +1,32 @@
+@baseURL = http://localhost:8080/api/auth
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTQ1MzgxNTM5YTE5ZTJiYTBkNWYiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3MjcxOTE4fQ.K_EixvUtp3NCtGO-v_uLtz1_lpFU9T05nfo8Yfk2O_k
+@huan = 622f1ea18b9ec92b8ef4c258
+
+### always change
+POST {{baseURL}}/always-change
+
+### first access
+POST {{baseURL}}/first-access
+Authorization: Bearer {{token}}
+################################
+GET {{baseURL}}/get
+
+### register user
+POST {{baseURL}}/register
+Content-Type: application/json
+
+{
+    "fullname":"pham long huan",
+    "username":"huan3",
+    "password": "Kelkifa123",
+    "email":"plhuan4553@gmail.com"
+}
+
+### login
+POST {{baseURL}}/login
+Content-Type: application/json
+
+{
+    "username":"huan3",
+    "password": "Kelkifa123"
+}

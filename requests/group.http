@@ -1,0 +1,4 @@
+@baseURL = http://localhost:8080/api/groups
+@myGroupId = 62306b152e4292f5fb7ee938
+################################
+GET {{baseURL}}/always-change
