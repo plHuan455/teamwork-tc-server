@@ -1,4 +1,23 @@
-@baseURL = http://localhost:8080/api/groups
+@baseURL = http://localhost:8080/api/group
 @myGroupId = 62306b152e4292f5fb7ee938
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjM1YjBlNTJlZWY2YzQ4NzI4YjU5YWEiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3Njg1OTIwfQ.0hp1XpyhG8LQb_G26oPhMCX2mEcnJQln8F5cymCzaiw
 ################################
 GET {{baseURL}}/always-change
+
+### create
+POST {{baseURL}}/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name":"Thuong va chon"
+}
+
+###
+POST {{baseURL}}/get-members
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjM2YTc1NGYzZmYzOGMyYzIzYzI0ZGUiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3Nzg0ODIzfQ.sLJamWQ_Agy9IEdL1ERx7n4zUGExAg4cRKcnYZrbKyI
+
+{
+    "groupId":"6236aabec0cb9fd24c4eabd8"
+}

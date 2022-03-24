@@ -1,5 +1,5 @@
 @baseURL = http://localhost:8080/api/auth
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjJmNTQ1MzgxNTM5YTE5ZTJiYTBkNWYiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3MjcxOTE4fQ.K_EixvUtp3NCtGO-v_uLtz1_lpFU9T05nfo8Yfk2O_k
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjM1YWIyYjcyZjQzNmY5ZjlkZmY0ZWQiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3Njg0NjUwfQ.qpDZtM9e7dHzGrqZUQ2vzbKa3IYgw5wub3aCBmDLqbU
 @huan = 622f1ea18b9ec92b8ef4c258
 
 ### always change
@@ -16,10 +16,12 @@ POST {{baseURL}}/register
 Content-Type: application/json
 
 {
-    "fullname":"pham long huan",
-    "username":"huan3",
-    "password": "Kelkifa123",
-    "email":"plhuan4553@gmail.com"
+    "data":{
+        "fullname":"pham long huan",
+        "username":"huan2",
+        "password": "Kelkifa123",
+        "email":"plhuan4552@gmail.com"
+    }
 }
 
 ### login
@@ -27,6 +29,13 @@ POST {{baseURL}}/login
 Content-Type: application/json
 
 {
-    "username":"huan3",
-    "password": "Kelkifa123"
+    "data":{
+        "username":"huan2",
+        "password": "Kelkifa123"
+    }
 }
+
+
+### get invites
+GET {{baseURL}}/get-invites
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjM2YTc1NGYzZmYzOGMyYzIzYzI0ZGUiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNjQ3NzQ5OTEwfQ.nyRVmXNfjh8Jwj3RGOf4l_Wncggz2MHKZ6Gc9iqeqCI

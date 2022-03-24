@@ -5,9 +5,11 @@ import getTokenDataMidleware from '../midlewares/getTokenDataMidleware.js';
 const authRouter = express.Router();
 
 authRouter.get('/get', AuthController.get);
+authRouter.get('/firstAccess', getTokenDataMidleware, AuthController.firstAccess);
+authRouter.get('/get-invites', getTokenDataMidleware, AuthController.GetInvites);
 authRouter.post('/register', AuthController.register);
 authRouter.post('/login', AuthController.login);
-authRouter.get('/firstAccess', getTokenDataMidleware, AuthController.firstAccess);
+authRouter.post('/accept-invite', getTokenDataMidleware, AuthController.AcceptInvite);
 authRouter.post('/always-change', AuthController.AlwaysChange);
 
 export default authRouter;

@@ -75,11 +75,12 @@ class TodoController {
         try {
 
             const isUserInGroup = await checkUserInGroup({ groupId, userId, noteId });
+            // return res.json({ success: false, message: 'sad', response: isUserInGroup })
             if (!isUserInGroup) return res.json({ success: false, message: 'Bạn không trong nhóm này' })
 
             const newTodo = new TodoModel({
                 name: todoName,
-                noteId
+                noteId,
             })
 
             const response = await TodoModel.create(newTodo);
@@ -163,7 +164,7 @@ async function checkUserInGroup({ userId, groupId, noteId }) {
         {
             $lookup: {
                 from: "group_members",
-                localField: "group._id",
+                localField: "groupId",
                 foreignField: "groupId",
                 as: 'groups'
             }
@@ -182,6 +183,8 @@ async function checkUserInGroup({ userId, groupId, noteId }) {
         }
     ])
 
+
+    // return foundUser;
     if (foundUser.length < 1) {
         return false;
     }

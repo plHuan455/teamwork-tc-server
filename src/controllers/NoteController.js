@@ -1,5 +1,5 @@
 import { DEMO_GROUP_TYPE } from '../../globalVariables.js';
-import GroupMemberModel from "../models/groupMember.js"
+import GroupModel from "../models/group.js";
 import NoteModel from "../models/note.js";
 import TodoModel from "../models/noteTodo.js";
 import mongoose from 'mongoose';
@@ -98,10 +98,11 @@ class NoteController {
     async Create(req, res) {
         const { data, userId, groupId } = req.body;
 
+        // console.log(req.body);
         if (!groupId | !data) return res.json({ success: false, message: 'bad request' });
 
         try {
-            const isUserInGroup = await checkUserInGroup({ groupId, userId, });
+            const isUserInGroup = await checkUserInGroup({ groupId, userId });
             if (!isUserInGroup) return res.json({ success: false, message: 'Bạn không trong nhóm này' })
 
             const newData = new NoteModel({ name: data.name, color: data.color, groupId, from: new Date(data.from), to: new Date(data.to) })
@@ -122,6 +123,8 @@ class NoteController {
     */
     async Delete(req, res) {
         const { noteId, userId, groupId } = req.body;
+
+        console.log(req.body);
         // console.log(`[req body]`, req.body);
         if (!data) return req.json({ success: false, message: 'bad request' });
         try {
@@ -148,7 +151,7 @@ class NoteController {
 
         if (!groupId || !noteList) return res.json({ success: false, message: 'bad request' });
         try {
-            const isUserInGroup = await checkUserInGroup({ groupId, userId, });
+            const isUserInGroup = await checkUserInGroup({ groupId, userId });
             if (!isUserInGroup) return res.json({ success: false, message: 'Bạn không trong nhóm này' })
 
             await NoteModel.deleteMany({ _id: { $in: noteList }, groupId });
@@ -251,27 +254,19 @@ function handleVerifyUser(matchObj = {}, groupId, userId) {
     }]
 }
 async function checkUserInGroup({ userId, groupId }) {
-    const foundUser = await NoteModel.aggregate([
+    const foundUser = await GroupModel.aggregate([
         {
             $lookup: {
                 from: "group_members",
-                localField: "groupId",
+                localField: "_id",
                 foreignField: "groupId",
                 as: 'groups'
             }
         },
         {
-            $lookup: {
-                from: "groups",
-                localField: "groupId",
-                foreignField: "_id",
-                as: 'group'
-            }
-        },
-        {
             $match: {
-                groupId: mongoose.Types.ObjectId(groupId),
-                $or: [{ "group.type": DEMO_GROUP_TYPE }, { "groups.userId": mongoose.Types.ObjectId(userId) }]
+                _id: mongoose.Types.ObjectId(groupId),
+                $or: [{ type: DEMO_GROUP_TYPE }, { "groups.userId": mongoose.Types.ObjectId(userId) }]
             }
         },
         {
@@ -281,6 +276,7 @@ async function checkUserInGroup({ userId, groupId }) {
         }
     ])
 
+    // const foundUser = await GroupMemberModel.find({ groupId, $or:[{userId}, ] });
     if (foundUser.length < 1) {
         return false;
     }

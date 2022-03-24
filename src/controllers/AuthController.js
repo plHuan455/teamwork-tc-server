@@ -1,6 +1,10 @@
-import argon2 from 'argon2'
+import GroupMemberModel from "../models/groupMember.js";
+import InviteModel from "../models/groupInvite.js";
+import RankModel from '../models/rank.js';
+import UserModel from '../models/user.js';
+import argon2 from 'argon2';
 import { createToken } from '../cores/handleToken.js';
-import userModel from '../models/user.js';
+import mongoose from 'mongoose';
 
 function handleError(err, res) {
     console.log(err);
@@ -9,8 +13,10 @@ function handleError(err, res) {
 class AuthController {
     async AlwaysChange(req, res) {
         try {
-            const response = await userModel.deleteMany();
-            return res.json({ success: true, message: 'successfully', response });
+
+            const response = await UserModel.deleteMany();
+
+            return res.json({ success: true, message: 'success', response });
         } catch (err) {
             console.log(err);
             return res.json({ success: false, message: 'internal server' })
@@ -25,14 +31,14 @@ class AuthController {
      */
     async firstAccess(req, res) {
         const { userId } = req.body;
-        const response = await userModel.findOne({ _id: userId }).select('-password -createdAt -updatedAt');
+        const response = await UserModel.findOne({ _id: userId }).select('-password -createdAt -updatedAt');
         if (!response) return res.json({ success: false, message: 'Người dùng không hợp lệ' })
         return res.json({ success: true, message: 'success', response });
     }
 
     async get(req, res) {
         try {
-            const response = await userModel.find();
+            const response = await UserModel.find();
 
             return res.json({ success: true, message: 'success', response });
         } catch (err) {
@@ -52,8 +58,15 @@ class AuthController {
             return res.json({ success: false, message: 'bad request' })
         }
         try {
+            const rank = await RankModel.findOne({ rank: 1 });
+
+            if (!rank) {
+                return res.json({ success: false, message: 'internal server' })
+            }
+
             const hashedPassword = await argon2.hash(password);
-            const newUser = new userModel({
+            const newUser = new UserModel({
+                rankId: mongoose.Types.ObjectId(rank._id),
                 fullname,
                 username,
                 password: hashedPassword,
@@ -61,7 +74,7 @@ class AuthController {
                 email
             })
 
-            const response = await userModel.create(newUser);
+            const response = await UserModel.create(newUser);
             const accessToken = createToken({ userId: newUser.userId, isAdmin: newUser.isAdmin });
 
             return res.json({
@@ -89,6 +102,76 @@ class AuthController {
             return res.json({ success: false, message: 'internal server' })
         }
     }
+
+    // [POST] /api/auth/get-invites
+    async GetInvites(req, res) {
+        const { userId } = req.body;
+        try {
+            const getInvite = await InviteModel.aggregate([
+                {
+                    $lookup: {
+                        from: "groups",
+                        foreignField: "_id",
+                        localField: "groupId",
+                        as: "group"
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "users",
+                        foreignField: "_id",
+                        localField: "userId",
+                        as: "user"
+                    }
+                },
+                {
+                    $match: {
+                        userId: mongoose.Types.ObjectId(userId)
+                    }
+                },
+                {
+                    $project: {
+                        "group.name": 1,
+                        "user.username": 1
+                    }
+                }
+            ]);
+
+            const response = getInvite.map(invite => (
+                {
+                    _id: invite._id,
+                    groupName: invite.group[0]?.name,
+                    userInvite: invite.user[0]?.username
+                }))
+            // let response = getInvite;
+            return res.json({ success: true, message: 'success', response });
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' });
+        }
+    }
+
+    // [POST] /api/auth/accept-invite
+    async AcceptInvite(req, res) {
+        const { userId, inviteId } = req.body;
+        if (!userId) return res.json({ success: false, message: 'Bạn chưa đăng nhập' });
+        if (!inviteId) return res.json({ success: false, message: 'bad request' });
+        try {
+            const inviteResponse = await InviteModel.findOne({ _id: inviteId });
+            if (!inviteResponse) return res.json({ success: false, message: 'bad request' });
+
+            const deleteResponse = await InviteModel.deleteOne({ _id: inviteId })
+            if (deleteResponse.deletedCount < 1) return res.json({ success: false, message: 'internal server' });
+            const response = await GroupMemberModel.create({ userId: inviteResponse.userId, groupId: inviteResponse.groupId });
+
+            if (!response._id) return res.json({ success: false, message: 'internal server' });
+            return res.json({ success: true, message: 'success' });
+
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' })
+        }
+    }
     /**
      * [POST] /api/auth/login
      * @param {*} req 
@@ -99,7 +182,7 @@ class AuthController {
         if (!username || !password) return res.json({ success: false, message: 'internal server' });
         try {
             // Find by username
-            const foundUser = await userModel.findOne({ username }).select('-updatedAt -createdAt');
+            const foundUser = await UserModel.findOne({ username }).select('-updatedAt -createdAt');
             // Not see username
             if (!foundUser) return res
                 .json({ success: false, message: 'Tài khoản hoạc mật khẩu không chính xác' });
