@@ -11,6 +11,7 @@ authRouter.post('/register', AuthController.register);
 authRouter.post('/login', AuthController.login);
 authRouter.post('/accept-invite', getTokenDataMidleware, AuthController.AcceptInvite);
 authRouter.delete('/disagree-invite', getTokenDataMidleware, AuthController.DisagreeInvite);
+authRouter.delete('/disagree-all-invite', getTokenDataMidleware, AuthController.DisagreeAllInvite);
 authRouter.post('/always-change', AuthController.AlwaysChange);
 
 export default authRouter;

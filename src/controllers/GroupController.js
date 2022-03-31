@@ -212,6 +212,7 @@ class GroupController {
         }
     }
 
+
     // [DELETE] /api/group/delete
     async Delete(req, res) {
         const { userId, groupId } = req.body;
