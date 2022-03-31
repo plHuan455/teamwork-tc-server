@@ -164,7 +164,7 @@ class GroupController {
         try {
             const [foundMember, foundGroup] = await Promise.all([UserModel.findOne({ username }).select("_id"), GroupModel.findOne({ adminId: userId, _id: groupId }).populate('adminId')]);
             if (!foundGroup) return res.json({ success: false, message: 'Bạn không có quyền thêm thành viên' })
-            if (!foundMember) return res.json({ success: false, message: 'Không tìm thấy thành viên' })
+            if (!foundMember) return res.json({ success: false, message: 'Không tìm thấy người này' })
 
             const [inviteRes, memberRes] = await Promise.all([
                 GroupInviteModel.findOne({ userId: foundMember._id, groupId }),
@@ -187,6 +187,29 @@ class GroupController {
             return res.json({ success: false, message: 'internal server' })
         }
 
+    }
+    // [POST] /api/group/out-group
+    async OutGroup(req, res) {
+        const { userId, groupId } = req.body;
+
+        if (!userId || !groupId) return res.json({ success: false, message: 'bad request' });
+        try {
+            const isAdmin = await GroupModel
+                .findOne({ _id: groupId, adminId: userId })
+                .select('_id');
+
+            if (isAdmin) return res.json({ success: false, message: "bad request" });
+
+
+            const deleteResponse = await GroupMemberModel.deleteOne({ groupId, userId })
+
+            if (deleteResponse.deletedCount === 0) return res.json({ success: false, message: 'Forbidden' });
+
+            return res.json({ success: true, message: 'success' });
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' });
+        }
     }
 
     // [DELETE] /api/group/delete

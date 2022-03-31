@@ -10,6 +10,7 @@ authRouter.get('/get-invites', getTokenDataMidleware, AuthController.GetInvites)
 authRouter.post('/register', AuthController.register);
 authRouter.post('/login', AuthController.login);
 authRouter.post('/accept-invite', getTokenDataMidleware, AuthController.AcceptInvite);
+authRouter.delete('/disagree-invite', getTokenDataMidleware, AuthController.DisagreeInvite);
 authRouter.post('/always-change', AuthController.AlwaysChange);
 
 export default authRouter;

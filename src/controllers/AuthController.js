@@ -172,6 +172,21 @@ class AuthController {
             return res.json({ success: false, message: 'internal server' })
         }
     }
+    // [DELETE] /api/auth/disagree-invite
+    async DisagreeInvite(req, res) {
+        const { userId, inviteId } = req.body;
+        if (!userId || !inviteId) return res.json({ success: false, message: 'bad request' });
+
+        try {
+            const deleteResponse = await InviteModel.deleteOne({ _id: inviteId, userId });
+            if (deleteResponse.deletedCount === 0) return res.json({ success: false, message: 'Forbidden' });
+
+            return res.json({ success: true, message: 'success' });
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' });
+        }
+    }
     /**
      * [POST] /api/auth/login
      * @param {*} req 
