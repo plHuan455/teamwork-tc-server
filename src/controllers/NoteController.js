@@ -7,10 +7,49 @@ import mongoose from 'mongoose';
 class NoteController {
     // [POST] /api/todos/always-change
     async AlwaysChange(req, res) {
+        const { userId, noteId, data } = req.body;
+        // console.log(userId);
         try {
-            const response = await NoteModel.deleteMany({});
+            const demoGroup = await GroupModel.findOne({ type: DEMO_GROUP_TYPE }).select('_id');
+            const isValid = await NoteModel.aggregate([
+                {
+                    $lookup: {
+                        from: "group_members",
+                        localField: "groupId",
+                        foreignField: "groupId",
+                        as: "group_members"
+                    }
+                },
+                {
+                    $match: {
+                        $or: [{ "group_members.userId": mongoose.Types.ObjectId(userId) },
+                        { "groupId": mongoose.Types.ObjectId(demoGroup._id) }
+                        ],
+                        "_id": mongoose.Types.ObjectId(noteId)
+                    },
+                },
+                {
+                    $project: {
+                        group_members: 0
+                    }
+                }
 
-            return res.json({ success: true, message: 'successfully', response })
+            ])
+
+            if (isValid.length === 0) return res.json({ success: false, message: "Forbidden" })
+            // const needUpdateNote = foundNote[0];
+            const response = await NoteModel.findOneAndUpdate({ _id: noteId }, {
+                $set: {
+                    name: data.name,
+                    color: data.color ? data.color : undefined,
+                    to: data.to ? new Date(data.to) : undefined,
+                    from: data.from ? new Date(data.from) : undefined,
+                }
+            }, { returnDocument: 'after' })
+
+            // const response = await NoteModel.findOne({ _id: noteId })
+
+            return res.json({ success: true, message: "success", response })
 
         } catch (err) {
             console.log(err);
@@ -117,6 +156,59 @@ class NoteController {
         }
 
     }
+    // [PATCH] /api/note/update
+    async Update(req, res) {
+        const { userId, noteId, data } = req.body;
+
+        if (!noteId || typeof data !== 'object') return res.json({ success: false, message: "bad request" });
+        try {
+
+            const demoGroup = await GroupModel.findOne({ type: DEMO_GROUP_TYPE }).select('_id');
+            const foundNote = await NoteModel.aggregate([
+                {
+                    $lookup: {
+                        from: "group_members",
+                        localField: "groupId",
+                        foreignField: "groupId",
+                        as: "group_members"
+                    }
+                },
+                {
+                    $match: {
+                        $or: [{ "group_members.userId": mongoose.Types.ObjectId(userId) },
+                        { "groupId": mongoose.Types.ObjectId(demoGroup._id) }
+                        ],
+                        "_id": mongoose.Types.ObjectId(noteId)
+                    },
+                },
+                {
+                    $project: {
+                        _id: 1
+                    }
+                }
+
+            ])
+
+            if (foundNote.length === 0) return res.json({ success: false, message: "Forbidden" })
+            // const needUpdateNote = foundNote[0];
+            const response = await NoteModel.findOneAndUpdate({ _id: noteId }, {
+                $set: {
+                    name: data.name,
+                    color: data.color ? data.color : undefined,
+                    to: data.to ? new Date(data.to) : undefined,
+                    from: data.from ? new Date(data.from) : undefined,
+                }
+            }, { returnDocument: 'after' }).select('-updatedAt -createdAt')
+
+            return res.json({ success: true, message: "success", response })
+        }
+        catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' })
+        }
+    }
+
+
     /** [DELETE] /api/note/delete 
      *  Delete a todo
      *  public (logged)
@@ -124,7 +216,6 @@ class NoteController {
     async Delete(req, res) {
         const { noteId, userId, groupId } = req.body;
 
-        console.log(req.body);
         // console.log(`[req body]`, req.body);
         if (!data) return req.json({ success: false, message: 'bad request' });
         try {
