@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 async function connect() {
     try {
-        await mongoose.connect("mongodb+srv://plhuan:Kelkifa123@cluster0.9asae.mongodb.net/teamword_tc?retryWrites=true&w=majority", {
+        await mongoose.connect(process.env.MONGO_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
