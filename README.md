@@ -17,3 +17,6 @@ Javascript
 - <a href="https://www.npmjs.com/package/cors">Cors</a>
 - <a href="https://www.npmjs.com/package/argon2">Argon2</a>
 - ...
+
+## Models
+<img width="100%" alt="teamwork_tc_database" src="https://user-images.githubusercontent.com/73534639/164203305-978f1b4f-ccda-4d15-ac52-d23209d5adf5.png">
