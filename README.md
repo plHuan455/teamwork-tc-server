@@ -20,3 +20,14 @@ Javascript
 
 ## Models
 <img width="100%" alt="teamwork_tc_database" src="https://user-images.githubusercontent.com/73534639/164203305-978f1b4f-ccda-4d15-ac52-d23209d5adf5.png">
+
+## Install and Run
+Clone this project to your local and:
+- install packages ```npm install```
+- Add .env file with content:
+```
+JWT_SECRET = [YOUR JSONWEBTOKEN STRING]
+
+MONGO_URI = [YOUR MONGODB URI]
+```
+- run project ```npm run dev```
