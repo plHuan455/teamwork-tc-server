@@ -20,7 +20,7 @@ Javascript
 - ...
 
 ## Models
-<img width="100%" alt="teamwork_tc_database" src="https://user-images.githubusercontent.com/73534639/164203305-978f1b4f-ccda-4d15-ac52-d23209d5adf5.png">
+<img width="100%" alt="teamwork_tc_database2 eddx" src="https://user-images.githubusercontent.com/73534639/164416903-99dc4491-7002-420a-8670-29b8ef602300.png">
 
 ## Install and Run
 Clone this project to your local and:
