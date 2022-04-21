@@ -16,6 +16,7 @@ Javascript
 - <a href="https://socket.io/">Socket.io</a>
 - <a href="https://www.npmjs.com/package/cors">Cors</a>
 - <a href="https://www.npmjs.com/package/argon2">Argon2</a>
+- <a href="https://www.npmjs.com/package/express-rate-limit">Express Rate Limit</a>
 - ...
 
 ## Models
