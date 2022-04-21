@@ -24,7 +24,7 @@ Javascript
 ## Install and Run
 Clone this project to your local and:
 - install packages ```npm install```
-- Add .env file with content:
+- Add .env file in root folder with content:
 ```
 JWT_SECRET = [YOUR JSONWEBTOKEN STRING]
 
