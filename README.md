@@ -32,3 +32,13 @@ JWT_SECRET = [YOUR JSONWEBTOKEN STRING]
 MONGO_URI = [YOUR MONGODB URI]
 ```
 - run project ```npm run dev```
+
+## Contact
+
+Email: plhuan455@gmail.com
+
+Facebook: <a href="https://www.facebook.com/kelkfia/">
+  <img width="20px" alt="fb" src="https://user-images.githubusercontent.com/73534639/164469882-63d62e38-d3e0-49df-9673-d5319f479f49.svg">
+</a> 
+
+
