@@ -14,7 +14,7 @@ function getTokenDataMidleware(req, res, next) {
     // console.log(tokenInfo);
     // console.log(tokenInfo);
     if (tokenInfo.error) {
-        return res.json({ success: false, message: 'invalid access token ' })
+        return res.status(401).json({ success: false, message: 'invalid token' })
     }
 
     req.body.userId = tokenInfo.data?.userId;

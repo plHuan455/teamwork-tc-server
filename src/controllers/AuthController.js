@@ -1,10 +1,13 @@
+import { createRefreshToken, createToken, verifyToken } from '../cores/handleToken.js';
+
 import GroupMemberModel from "../models/groupMember.js";
 import InviteModel from "../models/groupInvite.js";
 import RankModel from '../models/rank.js';
 import UserModel from '../models/user.js';
 import argon2 from 'argon2';
-import { createToken } from '../cores/handleToken.js';
+import { decode } from 'punycode';
 import mongoose from 'mongoose';
+import refreshTokenModel from "../models/refreshToken.js";
 
 function handleError(err, res) {
     console.log(err);
@@ -106,6 +109,7 @@ class AuthController {
     // [POST] /api/auth/get-invites
     async GetInvites(req, res) {
         const { userId } = req.body;
+
         try {
             const getInvite = await InviteModel.aggregate([
                 {
@@ -120,7 +124,7 @@ class AuthController {
                     $lookup: {
                         from: "users",
                         foreignField: "_id",
-                        localField: "userId",
+                        localField: "group.adminId",
                         as: "user"
                     }
                 },
@@ -137,6 +141,7 @@ class AuthController {
                 }
             ]);
 
+
             const response = getInvite.map(invite => (
                 {
                     _id: invite._id,
@@ -144,6 +149,7 @@ class AuthController {
                     userInvite: invite.user[0]?.username
                 }))
             // let response = getInvite;
+
             return res.json({ success: true, message: 'success', response });
         } catch (err) {
             console.log(err);
@@ -229,6 +235,14 @@ class AuthController {
 
             // Create token
             const accessToken = createToken({ userId: foundUser._id, isAdmin: foundUser.isAdmin });
+            const refreshToken = createRefreshToken({ userId: foundUser._id });
+            const getRefreshToken = await refreshTokenModel.findOne({ userId: foundUser._id });
+
+            if (getRefreshToken) {
+                await refreshTokenModel.updateOne({ userId: foundUser._id }, { token: refreshToken })
+            } else {
+                await refreshTokenModel.create({ userId: foundUser._id, refreshToken })
+            }
 
             // All good
             return res.json(
@@ -237,6 +251,7 @@ class AuthController {
                     message: 'successfully',
                     response: { _id: foundUser._id, username: foundUser.username, isAdmin: foundUser.isAdmin, email: foundUser.email, fullName: foundUser.fullName },
                     token: accessToken,
+                    refreshToken
                 })
 
         } catch (err) {
@@ -244,6 +259,45 @@ class AuthController {
             return res.status(500).json({ success: false, message: 'internal server' })
         }
 
+    }
+
+    // [POST] /api/auth/refresh-token
+    async RefreshToken(req, res) {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) return res.json({ success: false, message: 'invalid token' });
+
+
+        try {
+            const decoded = verifyToken(refreshToken, true);
+
+            // console.log(decoded);
+            if (decoded.error || !decoded.data) {
+                return res.status(401).json({ success: false, message: 'invalid token' });
+            }
+            const foundedRefreshToken = await refreshTokenModel.findOne({ userId: decoded.data.userId }).populate('userId');
+
+            if (!foundedRefreshToken) {
+                return res.status(401).json({ success: false, message: 'invalid token' });
+            }
+            if (foundedRefreshToken.token !== refreshToken) {
+                return res.status(401).json({ success: false, message: 'invalid token' });
+            }
+
+            // Create new token and refresh token
+            const newToken = createToken({ userId: foundedRefreshToken.userId._id, isAdmin: foundedRefreshToken.userId.isAdmin });
+            const newRefreshToken = createRefreshToken({ userId: foundedRefreshToken.userId._id });
+
+            const update = await refreshTokenModel.updateOne({ userId: foundedRefreshToken.userId }, { token: newRefreshToken });
+            if (update.modifiedCount !== 1) {
+                await refreshTokenModel.create({ userId: foundedRefreshToken.userId, token: newRefreshToken })
+            }
+            return res.json({ success: true, message: 'success', token: newToken, refreshToken: newRefreshToken })
+
+        } catch (err) {
+            console.log(err);
+            return res.json({ success: false, message: 'internal server' })
+        }
     }
 }
 

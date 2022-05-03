@@ -65,6 +65,7 @@ class NoteController {
 
     async Get(req, res) {
         // return res.sendStatus(401);
+
         const { userId, groupId, year, month } = req.body;
 
         if (!groupId || year == undefined || !month == undefined) return res.json({ success: false, message: 'bad request' });
