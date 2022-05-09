@@ -298,6 +298,8 @@ class AuthController {
     async RefreshToken(req, res) {
         const { refreshToken } = req.body;
 
+        console.log('refresh token');
+
         if (!refreshToken) return res.json({ success: false, message: 'invalid token' });
 
 
