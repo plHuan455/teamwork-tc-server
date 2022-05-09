@@ -15,7 +15,7 @@ export function verifyToken(token, isRefresh) {
 }
 
 export function createToken(data) {
-    return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '2h' });
+    return jwt.sign(data, process.env.JWT_SECRET, { expiresIn: '10s' });
 }
 
 export function createRefreshToken(data) {

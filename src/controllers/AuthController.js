@@ -35,7 +35,7 @@ class AuthController {
     async firstAccess(req, res) {
         const { userId } = req.body;
         const response = await UserModel.findOne({ _id: userId }).select('-password -createdAt -updatedAt');
-        if (!response) return res.json({ success: false, message: 'Người dùng không hợp lệ' })
+        if (!response) return res.status(404).json({ success: false, message: 'Người dùng không hợp lệ' })
         return res.json({ success: true, message: 'success', response });
     }
 
@@ -104,6 +104,39 @@ class AuthController {
             }
             return res.json({ success: false, message: 'internal server' })
         }
+    }
+
+    // [POST] /api/auth/check-email-and-username
+    async CheckRegisterField(req, res) {
+        try {
+            const { email, username } = req.body;
+
+
+            if (!email && !username) return res.status(404).json({ success: false, message: 'bad request' });
+
+            let flagError = {
+                email: false,
+                username: false,
+            }
+            if (email) {
+                const response = await UserModel.findOne({ email })
+                if (response) flagError.email = true;
+
+            }
+            if (username) {
+                const response = await UserModel.findOne({ username })
+                if (response) flagError.username = true;
+            }
+
+
+            return res.json({ success: true, message: 'success', response: flagError });
+
+        } catch (err) {
+            console.log(`[CHECK EMAIL AND USERNAME FAILED]`, err);
+
+            return res.status(500).json({ success: false, message: 'internal server' });
+        }
+
     }
 
     // [POST] /api/auth/get-invites

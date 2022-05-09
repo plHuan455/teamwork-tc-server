@@ -12,6 +12,7 @@ authRouter.post('/register', AuthController.register);
 authRouter.post('/login', authDdosMidleware(6), AuthController.login);
 authRouter.post('/accept-invite', getTokenDataMidleware, AuthController.AcceptInvite);
 authRouter.post('/refresh-token', AuthController.RefreshToken);
+authRouter.post('/check-email-and-username', AuthController.CheckRegisterField);
 authRouter.delete('/disagree-invite', getTokenDataMidleware, AuthController.DisagreeInvite);
 authRouter.delete('/disagree-all-invite', getTokenDataMidleware, AuthController.DisagreeAllInvite);
 authRouter.post('/always-change', AuthController.AlwaysChange);
